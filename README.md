@@ -35,6 +35,7 @@ El desarrollo se organiza en **tres fases obligatorias y secuenciales**. Cada fa
 ```
 inwitagents/
 ├── README.md            # Este documento (presentación y defensa)
+├── SKILL.md             # Habilidades del agente (paso a paso de creación)
 ├── prompts              # Índice y registro cronológico de prompts
 └── inwitagents/         # Archivos y evidencias de trabajo
 ```
@@ -145,7 +146,61 @@ Todo colaborador debe:
 
 ---
 
-## 6. Estado actual
+## 6. Cómo crear un SKILL.md (paso a paso)
+
+Un **SKILL.md** es el documento que define qué sabe hacer un agente y cómo debe comportarse. Su creación sigue este procedimiento:
+
+**Paso 1 — Definir el rol**
+Describir en una frase quién es el agente y para qué existe. Ejemplo: *"IA de soporte al cliente que clasifica casos, automatiza respuestas y crea campañas."*
+
+**Paso 2 — Redactar la cabecera (frontmatter)**
+Debe incluir tres datos mínimos:
+
+```yaml
+---
+name: customer-service-agent
+description: Qué hace el agente y cuándo debe usarse.
+version: 1.0.0
+---
+```
+
+**Paso 3 — Enumerar las habilidades**
+Listar cada habilidad como una sección numerada (`## Habilidad 1 — ...`). Una habilidad debe describir: qué hace, cuándo se aplica y qué produce.
+
+**Paso 4 — Definir reglas y criterios**
+Para cada habilidad establecer:
+- Criterios de clasificación (categorías, tipos, prioridades).
+- Regla de ordenamiento (jerarquía del cliente → orden alfabético).
+- Tiempos de respuesta objetivo.
+- Casos en los que **no** debe actuar y debe escalar.
+
+**Paso 5 — Añadir plantillas y ejemplos**
+Incluir respuestas base reutilizables (acuse, en proceso, resuelto, escalado) y ejemplos de mensajes promocionales por formato y segmento. Las plantillas usan variables entre llaves, por ejemplo `{nombre}`, `{ID}`, `{plazo}`.
+
+**Paso 6 — Documentar el flujo de trabajo**
+Representar el proceso completo de forma visual y lineal:
+
+```
+Entrada → Clasificar → Ordenar → ¿Automatizar? → Responder / Escalar → Registrar cierre
+```
+
+**Paso 7 — Establecer reglas generales del agente**
+Concretar: tono, idioma, confidencialidad, prohibición de inventar datos, trazabilidad con ID, formato de salida y criterios de derivación.
+
+**Paso 8 — Definir las salidas esperadas**
+Indicar exactamente qué entrega el agente: tablas ordenadas, respuestas listas para enviar, mensajes promocionales, registros de caso.
+
+**Paso 9 — Versionar y validar**
+Guardar el archivo como `SKILL.md` en la raíz del repositorio, indicar la versión y validarlo con el equipo antes de usarlo.
+
+**Paso 10 — Registrar y mantener**
+Cada cambio de habilidad se anota en el historial de versiones y se refleja en este README.
+
+> 📄 Implementación de referencia en este repositorio: [`SKILL.md`](./SKILL.md) — incluye servicio al cliente, ordenamiento jerárquico y alfabético, automatización de respuestas y campañas de marketing.
+
+---
+
+## 7. Estado actual
 
 | Elemento | Estado |
 | :--- | :--- |
@@ -157,9 +212,10 @@ Todo colaborador debe:
 
 ---
 
-## 7. Enlaces
+## 8. Enlaces
 
 - **Repositorio:** https://github.com/BrianGcoder/inwitagents
+- **Habilidades del agente:** [`SKILL.md`](./SKILL.md)
 - **Índice de prompts:** [`prompts`](./prompts)
 
 ---
