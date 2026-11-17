@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INWIT · Ecosistema de Inteligencia Artificial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#030712;
+    --bg-2:#060f26;
+    --panel:rgba(11,25,60,.45);
+    --panel-hover:rgba(17,37,88,.55);
+    --line:rgba(112,214,255,.16);
+    --line-hover:rgba(112,214,255,.45);
+    --text:#e8f2ff;
+    --muted:#8fa7c4;
+    --cyan:#70d6ff;
+    --bright:#00f0ff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    min-height:100vh;
+    font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1000px 600px at 12% -10%, rgba(0,240,255,.14), transparent 60%),
+      radial-gradient(900px 700px at 95% 0%, rgba(124,58,237,.16), transparent 55%),
+      radial-gradient(800px 800px at 50% 120%, rgba(59,130,246,.14), transparent 60%),
+      linear-gradient(180deg,var(--bg) 0%, var(--bg-2) 55%, var(--bg) 100%);
+    background-attachment:fixed;
+    overflow-x:hidden;
+  }
+  /* Estrellas */
+  .stars{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55}
+  .stars span{
+    position:absolute;width:2px;height:2px;border-radius:50%;
+    background:#fff;animation:twinkle 5s ease-in-out infinite;
+  }
+  @keyframes twinkle{0%,100%{opacity:.15;transform:scale(.8)}50%{opacity:.9;transform:scale(1.35)}}
+
+  .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:0 24px 72px}
+
+  /* ---------- Header ---------- */
+  header{padding:34px 0 10px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{
+    width:46px;height:46px;border-radius:14px;display:grid;place-items:center;
+    background:linear-gradient(135deg,rgba(112,214,255,.22),rgba(59,130,246,.12));
+    border:1px solid rgba(112,214,255,.4);
+    box-shadow:0 0 24px rgba(0,240,255,.25), inset 0 0 18px rgba(0,240,255,.12);
+    font-family:'Orbitron',sans-serif;font-weight:900;font-size:19px;color:var(--bright);
+  }
+  .brand-txt strong{
+    display:block;font-family:'Orbitron',sans-serif;font-weight:700;font-size:20px;letter-spacing:.32em;
+    background:linear-gradient(90deg,#fff,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .brand-txt small{display:block;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+  .status{
+    display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted);
+    border:1px solid var(--line);border-radius:999px;padding:9px 16px;background:rgba(6,15,38,.5);
+    backdrop-filter:blur(10px);
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:#22e37a;box-shadow:0 0 10px #22e37a;animation:pulse 2s infinite}
+  @keyframes pulse{50%{opacity:.45}}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:46px 0 34px;max-width:800px}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--cyan);border:1px solid var(--line);padding:8px 14px;border-radius:999px;background:rgba(112,214,255,.06);
+    margin-bottom:20px;
+  }
+  .hero h1{font-family:'Orbitron',sans-serif;font-size:clamp(30px,5vw,52px);line-height:1.12;font-weight:900;letter-spacing:.01em}
+  .hero h1 span{background:linear-gradient(90deg,var(--cyan),#a78bfa 60%,#f0abfc);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin-top:16px;color:var(--muted);font-size:16px;line-height:1.65;max-width:640px;font-weight:400}
+
+  /* ---------- Buscador ---------- */
+  .toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:8px 0 30px}
+  .search{
+    position:relative;flex:1 1 320px;max-width:460px;
+  }
+  .search input{
+    width:100%;padding:13px 16px 13px 44px;border-radius:12px;color:var(--text);
+    background:rgba(6,15,38,.65);border:1px solid var(--line);outline:none;font-family:inherit;font-size:14px;
+    transition:.25s;backdrop-filter:blur(10px);
+  }
+  .search input::placeholder{color:#5d7590}
+  .search input:focus{border-color:rgba(112,214,255,.6);box-shadow:0 0 0 4px rgba(0,240,255,.08), 0 0 24px rgba(0,240,255,.12)}
+  .search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:#6b86a3;fill:none;stroke-width:2}
+  .kbd{
+    position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:10px;color:#5d7590;
+    border:1px solid rgba(143,167,196,.25);border-radius:6px;padding:3px 7px;background:rgba(3,7,18,.6)
+  }
+  .count{font-size:12px;color:var(--muted);letter-spacing:.04em}
+  .count b{color:var(--cyan);font-weight:600}
+
+  /* ---------- Grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:22px}
+  .card{
+    position:relative;border-radius:18px;padding:26px;overflow:hidden;display:flex;flex-direction:column;
+    background:linear-gradient(160deg,var(--panel),rgba(3,7,18,.65));
+    border:1px solid var(--line);
+    transition:transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s, box-shadow .35s, background .35s;
+    backdrop-filter:blur(14px);
+  }
+  .card::before{
+    content:'';position:absolute;inset:0;opacity:0;transition:opacity .35s;pointer-events:none;
+    background:radial-gradient(500px 220px at 50% -20%, var(--accent-soft, rgba(112,214,255,.18)), transparent 70%);
+  }
+  .card::after{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent,#70d6ff),transparent);
+    opacity:.45;transition:opacity .35s;
+  }
+  .card:hover{
+    transform:translateY(-7px);
+    border-color:var(--accent-line, var(--line-hover));
+    box-shadow:0 26px 50px -18px rgba(0,0,0,.75), 0 0 42px -6px var(--accent-glow, rgba(0,240,255,.3));
+  }
+  .card:hover::before{opacity:1}
+  .card:hover::after{opacity:1}
+
+  .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+  .icon{
+    width:54px;height:54px;border-radius:15px;display:grid;place-items:center;flex-shrink:0;
+    font-size:23px;
+    background:var(--icon-bg, rgba(112,214,255,.12));
+    border:1px solid var(--accent-line, rgba(112,214,255,.35));
+    box-shadow:inset 0 0 20px var(--accent-soft, rgba(0,240,255,.12));
+    transition:.35s;
+  }
+  .card:hover .icon{transform:scale(1.06) rotate(-3deg);box-shadow:inset 0 0 24px var(--accent-soft), 0 0 26px var(--accent-glow)}
+  .badge{
+    font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;
+    color:var(--accent,#70d6ff);border:1px solid var(--accent-line, rgba(112,214,255,.3));
+    background:var(--icon-bg, rgba(112,214,255,.08));border-radius:999px;padding:5px 10px;white-space:nowrap;
+  }
+  .card h2{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;letter-spacing:.03em;margin-bottom:4px}
+  .role{font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent,#70d6ff);font-weight:600;margin-bottom:13px}
+  .card p{font-size:13.5px;line-height:1.6;color:var(--muted);font-weight:400;flex:1}
+
+  .tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+  .tag{
+    font-size:10.5px;color:#a9c2dd;background:rgba(112,214,255,.06);
+    border:1px solid rgba(112,214,255,.13);border-radius:6px;padding:4px 8px;letter-spacing:.03em;
+  }
+
+  .card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:22px;padding-top:18px;border-top:1px solid rgba(112,214,255,.1)}
+  .file{font-size:10px;color:#5d7590;font-family:ui-monospace,Consolas,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:52%}
+  .open{
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-size:12.5px;font-weight:700;
+    color:var(--accent,#70d6ff);padding:9px 15px;border-radius:10px;
+    border:1px solid var(--accent-line, rgba(112,214,255,.35));
+    background:var(--icon-bg, rgba(112,214,255,.08));
+    transition:.25s;white-space:nowrap;
+  }
+  .open svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;transition:transform .25s}
+  .open:hover{background:var(--accent,#70d6ff);color:#04101c;border-color:transparent;box-shadow:0 0 24px var(--accent-glow)}
+  .open:hover svg{transform:translateX(3px)}
+
+  /* Colores por agente */
+  .c-inwit{--accent:#70d6ff;--accent-soft:rgba(112,214,255,.2);--accent-glow:rgba(0,240,255,.35);--accent-line:rgba(112,214,255,.45);--icon-bg:rgba(112,214,255,.12)}
+  .c-isis{--accent:#38bdf8;--accent-soft:rgba(56,189,248,.2);--accent-glow:rgba(56,189,248,.38);--accent-line:rgba(56,189,248,.45);--icon-bg:rgba(56,189,248,.12)}
+  .c-seemo{--accent:#34d399;--accent-soft:rgba(52,211,153,.2);--accent-glow:rgba(52,211,153,.38);--accent-line:rgba(52,211,153,.45);--icon-bg:rgba(52,211,153,.12)}
+  .c-petra{--accent:#e879f9;--accent-soft:rgba(232,121,249,.2);--accent-glow:rgba(232,121,249,.38);--accent-line:rgba(232,121,249,.45);--icon-bg:rgba(232,121,249,.12)}
+  .c-shinko{--accent:#fbbf24;--accent-soft:rgba(251,191,36,.2);--accent-glow:rgba(251,191,36,.38);--accent-line:rgba(251,191,36,.45);--icon-bg:rgba(251,191,36,.12)}
+  .c-prod{--accent:#fb8500;--accent-soft:rgba(251,133,0,.2);--accent-glow:rgba(251,133,0,.38);--accent-line:rgba(251,133,0,.45);--icon-bg:rgba(251,133,0,.12)}
+
+  .empty{display:none;text-align:center;padding:70px 20px;color:var(--muted);font-size:14px}
+  .empty.show{display:block}
+  .empty b{display:block;font-family:'Orbitron',sans-serif;color:var(--cyan);font-size:18px;margin-bottom:8px}
+
+  footer{margin-top:56px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11.5px;color:#5d7590;letter-spacing:.05em}
+  footer span b{color:#8fa7c4;font-weight:600}
+
+  @media (max-width:560px){
+    .wrap{padding:0 16px 56px}
+    .hero{padding:34px 0 26px}
+    .card{padding:22px}
+    .grid{grid-template-columns:1fr;gap:16px}
+    .status{font-size:11px;padding:7px 12px}
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">IW</div>
+      <div class="brand-txt">
+        <strong>INWIT</strong>
+        <small>AI Ecosystem</small>
+      </div>
+    </div>
+    <div class="status"><span class="dot"></span> Ecosistema activo · 6 especialistas</div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">✦ Plataforma de Inteligencia Artificial</div>
+    <h1>Un ecosistema,<br><span>múltiples inteligencias.</span></h1>
+    <p>Explora y accede a cada uno de los especialistas de IA de INWIT. Cada agente tiene su propia interfaz, personalidad y dominio de expertise.</p>
+  </section>
+
+  <div class="toolbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Buscar especialista, área o archivo..." autocomplete="off">
+      <span class="kbd">/</span>
+    </div>
+    <div class="count"><b id="shown">6</b> de 6 especialistas</div>
+  </div>
+
+  <main class="grid" id="grid">
+
+    <!-- Inwit -->
+    <article class="card c-inwit" data-search="inwit cosmic plataforma ecosistema principal inicio general central">
+      <div class="card-top">
+        <div class="icon">🌌</div>
+        <div class="badge">Hub principal</div>
+      </div>
+      <h2>Inwit</h2>
+      <div class="role">Ecosistema de IA especializada</div>
+      <p>Plataforma central que reúne y orquesta todo el ecosistema de inteligencia artificial especializada de INWIT.</p>
+      <div class="tags">
+        <span class="tag">Ecosistema</span><span class="tag">Plataforma</span><span class="tag">Orquestación</span>
+      </div>
+      <div class="card-foot">
+        <span class="file">inwit_ai_cosmic_platform.html</span>
+        <a class="open" href="inwit_ai_cosmic_platform.html">Abrir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </article>
+
+    <!-- Isis -->
+    <article class="card c-isis" data-search="isis talento rrhh recursos humanos personas reclutamiento empleo">
+      <div class="card-top">
+        <div class="icon">👔</div>
+        <div class="badge">Talento & RRHH</div>
+      </div>
+      <h2>Isis</h2>
+      <div class="role">Especialista en Talento & RRHH</div>
+      <p>Asistente experta en gestión de personas, reclutamiento, cultura organizacional y procesos de recursos humanos.</p>
+      <div class="tags">
+        <span class="tag">RRHH</span><span class="tag">Reclutamiento</span><span class="tag">Cultura</span>
+      </div>
+      <div class="card-foot">
+        <span class="file">isis_ai_chat_inwit.html</span>
+        <a class="open" href="isis_ai_chat_inwit.html">Abrir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </article>
+
+    <!-- Seemo -->
+    <article class="card c-seemo" data-search="seemo comunicaciones citas agenda reuniones calendar correo mensajes">
+      <div class="card-top">
+        <div class="icon">📅</div>
+        <div class="badge">Comunicaciones</div>
+      </div>
+      <h2>Seemo</h2>
+      <div class="role">Comunicaciones & Citas</div>
+      <p>Gestiona la comunicación, agenda citas, organiza reuniones y mantiene tus flujos de contacto bajo control.</p>
+      <div class="tags">
+        <span class="tag">Agenda</span><span class="tag">Citas</span><span class="tag">Mensajería</span>
+      </div>
+      <div class="card-foot">
+        <span class="file">seemo_ai_chat_inwit.html</span>
+        <a class="open" href="seemo_ai_chat_inwit.html">Abrir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </article>
+
+    <!-- Petra -->
+    <article class="card c-petra" data-search="petra creatividad creative studio diseño contenido marketing visual marca">
+      <div class="card-top">
+        <div class="icon">🎨</div>
+        <div class="badge">Creatividad</div>
+      </div>
+      <h2>Petra</h2>
+      <div class="role">Creative Studio</div>
+      <p>Estudio creativo con IA para ideación, diseño de contenido, campañas y construcción de marca.</p>
+      <div class="tags">
+        <span class="tag">Diseño</span><span class="tag">Contenido</span><span class="tag">Branding</span>
+      </div>
+      <div class="card-foot">
+        <span class="file">petra_creative_studio_inwit_chat.html</span>
+        <a class="open" href="petra_creative_studio_inwit_chat.html">Abrir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </article>
+
+    <!-- Shinko -->
+    <article class="card c-shinko" data-search="shinko chat asistente conversacion general ia agente">
+      <div class="card-top">
+        <div class="icon">🤖</div>
+        <div class="badge">Asistente IA</div>
+      </div>
+      <h2>Shinko</h2>
+      <div class="role">Chat conversacional</div>
+      <p>Asistente conversacional de propósito general con el que puedes dialogar sobre cualquier tema.</p>
+      <div class="tags">
+        <span class="tag">Chat</span><span class="tag">Conversación</span><span class="tag">Asistencia</span>
+      </div>
+      <div class="card-foot">
+        <span class="file">shinko_ai_chat_inwit.html</span>
+        <a class="open" href="shinko_ai_chat_inwit.html">Abrir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </article>
+
+    <!-- Shinko Producción -->
+    <article class="card c-prod" data-search="shinko produccion production assistant operaciones procesos industria fabrica">
+      <div class="card-top">
+        <div class="icon">⚙️</div>
+        <div class="badge">Producción</div>
+      </div>
+      <h2>Shinko <span style="font-size:13px;color:#8fa7c4;font-weight:500">· Pro</span></h2>
+      <div class="role">Production Assistant</div>
+      <p>Asistente especializado en producción y operaciones: optimiza procesos, tareas y flujos de trabajo.</p>
+      <div class="tags">
+        <span class="tag">Producción</span><span class="tag">Operaciones</span><span class="tag">Procesos</span>
+      </div>
+      <div class="card-foot">
+        <span class="file">shinko_production_assistant_inwit_chat.html</span>
+        <a class="open" href="shinko_production_assistant_inwit_chat.html">Abrir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </article>
+
+  </main>
+
+  <div class="empty" id="empty">
+    <b>Sin resultados</b>
+    No encontramos ningún especialista con ese término.
+  </div>
+
+  <footer>
+    <span><b>INWIT</b> · Ecosistema de Inteligencia Artificial Especializada</span>
+    <span>6 interfaces · <b>index.html</b> generado automáticamente</span>
+  </footer>
+</div>
+
+<script>
+  // Estrellas de fondo
+  (function(){
+    const box = document.getElementById('stars');
+    const n = 70, frag = document.createDocumentFragment();
+    for (let i = 0; i < n; i++) {
+      const s = document.createElement('span');
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      s.style.animationDelay = (Math.random() * 5) + 's';
+      s.style.animationDuration = (3 + Math.random() * 4) + 's';
+      s.style.opacity = (0.2 + Math.random() * 0.7).toFixed(2);
+      const size = (Math.random() > 0.85) ? 3 : 2;
+      s.style.width = s.style.height = size + 'px';
+      frag.appendChild(s);
+    }
+    box.appendChild(frag);
+  })();
+
+  // Buscador
+  const q = document.getElementById('q');
+  const cards = [...document.querySelectorAll('.card')];
+  const shown = document.getElementById('shown');
+  const empty = document.getElementById('empty');
+  const grid = document.getElementById('grid');
+
+  function filter(){
+    const term = q.value.trim().toLowerCase();
+    let visible = 0;
+    cards.forEach(card => {
+      const hay = (card.dataset.search + ' ' + card.textContent).toLowerCase();
+      const ok = !term || hay.includes(term);
+      card.style.display = ok ? '' : 'none';
+      if (ok) visible++;
+    });
+    shown.textContent = visible;
+    empty.classList.toggle('show', visible === 0);
+    grid.style.display = visible === 0 ? 'none' : '';
+  }
+  q.addEventListener('input', filter);
+
+  // Atajo "/" para buscar · Esc para limpiar
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+    if (e.key === 'Escape' && document.activeElement === q) { q.value = ''; filter(); q.blur(); }
+  });
+</script>
+
+<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+<script type="module">
+  import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+  createChat({
+    webhookUrl: 'https://inwitagents.app.n8n.cloud/webhook/6e31d4f1-d624-4a24-8cd3-d4d2dd72f500/chat',
+    mode: 'window',
+    showWelcomeScreen: false,
+    defaultLanguage: 'en',
+    metadata: { agent: 'seemo' },
+    initialMessages: [
+      'Hola, soy Seemo de Inwit. ¿En qué puedo ayudarte hoy?'
+    ],
+    i18n: {
+      en: {
+        title: 'Inwit',
+        subtitle: 'Escríbenos, te respondemos al instante.',
+        footer: '',
+        getStarted: 'Nueva conversación',
+        inputPlaceholder: 'Escribe tu mensaje...'
+      }
+    }
+  });
+</script>
+Selector para elegir con qué agente hablar (Seemo, Petra o Shinko):
+
+<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+<div id="inwit-selector" style="position:fixed;bottom:90px;right:20px;z-index:9999;font-family:sans-serif">
+  <select id="inwit-agent" style="padding:8px;border-radius:8px">
+    <option value="seemo">Seemo - Ventas</option>
+    <option value="petra">Petra - Creatividad</option>
+    <option value="shinko">Shinko - Industria</option>
+  </select>
+</div>
+<script type="module">
+  import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+  const url = 'https://inwitagents.app.n8n.cloud/webhook/6e31d4f1-d624-4a24-8cd3-d4d2dd72f500/chat';
+  const saludos = {
+    seemo: 'Hola, soy Seemo. Te cuento cómo Inwit puede automatizar tus ventas.',
+    petra: 'Hola, soy Petra. Hablemos de tu campaña o proyecto creativo.',
+    shinko: 'Hola, soy Shinko. Cuéntame sobre tu línea de producción y tus KPIs.'
+  };
+  let chat;
+
+  function iniciar(agente) {
+    if (chat) chat.unmount();
+    chat = createChat({
+      webhookUrl: url,
+      mode: 'window',
+      showWelcomeScreen: false,
+      metadata: { agent: agente },
+      initialMessages: [saludos[agente]]
+    });
+  }
+
+  const selector = document.getElementById('inwit-agent');
+  selector.addEventListener('change', () => iniciar(selector.value));
+  iniciar('seemo');
+</script>
+
+</body>
+</html>

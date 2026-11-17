@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petra · Directora creativa INWIT</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f4f1ec; height: 100vh; display: flex; justify-content: center;
+  }
+  .chat {
+    width: 100%; max-width: 760px; height: 100vh; display: flex; flex-direction: column;
+    background: #fff; box-shadow: 0 0 30px rgba(0,0,0,.08);
+  }
+  header {
+    padding: 16px 20px; background: #1d1d1f; color: #fff; display: flex; align-items: center; gap: 12px;
+  }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg,#ff6b6b,#ffb347);
+    display: flex; align-items: center; justify-content: center; font-weight: 700;
+  }
+  header small { display: block; opacity: .7; font-size: 12px; }
+  #mensajes { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { max-width: 80%; padding: 12px 16px; border-radius: 16px; line-height: 1.5; font-size: 15px; word-wrap: break-word; }
+  .msg.user { align-self: flex-end; background: #1d1d1f; color: #fff; border-bottom-right-radius: 4px; }
+  .msg.bot  { align-self: flex-start; background: #f0ece6; color: #1d1d1f; border-bottom-left-radius: 4px; }
+  .msg.bot h1, .msg.bot h2, .msg.bot h3 { font-size: 16px; margin: 8px 0 4px; }
+  .msg.bot ul { margin: 4px 0 4px 20px; }
+  .msg.bot code { background: #e2ddd5; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+  .msg.error { align-self: center; background: #ffe5e5; color: #a00; font-size: 13px; }
+  .escribiendo { align-self: flex-start; color: #888; font-size: 13px; font-style: italic; }
+  form { display: flex; gap: 8px; padding: 14px; border-top: 1px solid #eee; }
+  textarea {
+    flex: 1; resize: none; border: 1px solid #ddd; border-radius: 12px; padding: 12px;
+    font: inherit; height: 48px; max-height: 140px;
+  }
+  textarea:focus { outline: none; border-color: #ff8a5b; }
+  button {
+    border: none; background: #ff6b4a; color: #fff; padding: 0 20px; border-radius: 12px;
+    font-weight: 600; cursor: pointer;
+  }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<div class="chat">
+  <header>
+    <div class="avatar">P</div>
+    <div>Petra<small>Directora creativa · INWIT</small></div>
+  </header>
+
+  <div id="mensajes">
+    <div class="msg bot">¡Hola! Soy Petra. Cuéntame tu idea y la convertimos en algo que se pueda producir.</div>
+  </div>
+
+  <form id="formulario">
+    <textarea id="entrada" placeholder="Escribe tu mensaje..." required></textarea>
+    <button type="submit" id="enviar">Enviar</button>
+  </form>
+</div>
+
+<script>
+  const WEBHOOK_URL = "https://valeng.app.n8n.cloud/webhook/petra";
+
+  // Un sessionId por navegador para que Petra recuerde la conversación
+  let sessionId = localStorage.getItem("petra_session");
+  if (!sessionId) {
+    sessionId = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2));
+    localStorage.setItem("petra_session", sessionId);
+  }
+
+  const mensajes = document.getElementById("mensajes");
+  const form = document.getElementById("formulario");
+  const entrada = document.getElementById("entrada");
+  const boton = document.getElementById("enviar");
+
+  function escapar(t) {
+    return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  // Markdown básico: títulos, negritas, cursivas, código y listas
+  function markdown(texto) {
+    let html = escapar(texto)
+      .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+      .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+      .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>")
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/^\s*[-*] (.*)$/gm, "<li>$1</li>");
+    html = html.replace(/(<li>.*<\/li>\n?)+/g, m => "<ul>" + m.replace(/\n/g,"") + "</ul>");
+    return html.replace(/\n/g, "<br>");
+  }
+
+  function agregar(texto, tipo) {
+    const div = document.createElement("div");
+    div.className = "msg " + tipo;
+    div.innerHTML = tipo === "bot" ? markdown(texto) : escapar(texto).replace(/\n/g,"<br>");
+    mensajes.appendChild(div);
+    mensajes.scrollTop = mensajes.scrollHeight;
+    return div;
+  }
+
+
+
+function agregar(texto, tipo, imagen) {
+    const div = document.createElement("div");
+    div.className = "msg " + tipo;
+    div.innerHTML = tipo === "bot" ? markdown(texto) :
+escapar(texto).replace(/\n/g,"<br>");
+    if (imagen) {
+        const img = document.createElement("img");
+        img.src = imagen;
+        img.style.cssText = "display:block;max-width:100%;border-
+radius:12px;margin-top:10px;";
+        const link = document.createElement("a");
+        link.href = imagen;
+        link.download = "petra.png";
+        link.textContent = "Descargar imagen";
+        link.style.cssText = "display:inline-block;margin-top:6px;font-
+size:13px;color:#ff6b4a;";
+        div.appendChild(img);
+        div.appendChild(link);
+    }
+    mensajes.appendChild(div);
+    mensajes.scrollTop = mensajes.scrollHeight;
+    return div;
+}
+
+
+
+
+
+
+  async function enviar(texto) {
+    agregar(texto, "user");
+    entrada.value = "";
+    boton.disabled = true;
+
+    const cargando = document.createElement("div");
+    cargando.className = "escribiendo";
+    cargando.textContent = "Petra está escribiendo...";
+    mensajes.appendChild(cargando);
+    mensajes.scrollTop = mensajes.scrollHeight;
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mensaje: texto, sessionId: sessionId })
+      });
+      if (!res.ok) throw new Error("Error " + res.status);
+      const data = await res.json();
+      cargando.remove();
+      agregar(data.respuesta || "(Sin respuesta)", "bot");
+    } catch (err) {
+      cargando.remove();
+      agregar("No pude conectar con Petra. " + err.message, "error");
+    } finally {
+      boton.disabled = false;
+      entrada.focus();
+    }
+  }
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const texto = entrada.value.trim();
+    if (texto) enviar(texto);
+  });
+
+  // Enter envía; Shift+Enter hace salto de línea
+  entrada.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      form.requestSubmit();
+    }
+  });
+</script>
+</body>
+</html>

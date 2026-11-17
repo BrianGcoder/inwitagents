@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full w-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inwit - Ecosistema de Inteligencia Artificial Especializada</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        orbitron: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        inwit: {
+                            950: '#030712',
+                            900: '#060f26',
+                            800: '#0b193c',
+                            700: '#112558',
+                            cyan: '#70d6ff',
+                            blue: '#3b82f6',
+                            bright: '#00f0ff'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(11, 25, 60, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(112, 214, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 5, 20, 0.5),
+                        inset 0 0 15px 0 rgba(82, 178, 250, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(8, 20, 48, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(112, 214, 255, 0.18);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(112, 214, 255, 0.6);
+            box-shadow: 0 20px 45px rgba(0, 180, 256, 0.25),
+                        0 0 30px rgba(112, 214, 255, 0.3);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 12px rgba(112, 214, 255, 0.6), 0 0 24px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Pulsing Glow Animation */
+        @keyframes starGlow {
+            0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 20px #52b2fa); }
+            50% { opacity: 1; filter: drop-shadow(0 0 45px #70d6ff) drop-shadow(0 0 80px #3b82f6); }
+        }
+
+        .animate-star-glow {
+            animation: starGlow 3s infinite ease-in-out;
+        }
+
+        /* Supernova burst animation */
+        @keyframes starburst {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            40% { transform: scale(1.3) rotate(45deg); filter: brightness(4) drop-shadow(0 0 100px #fff); }
+            100% { transform: scale(30) rotate(180deg); opacity: 0; }
+        }
+
+        .animate-supernova {
+            animation: starburst 1.6s ease-in forwards;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030712;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(112, 214, 255, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(112, 214, 255, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-inwit-950 text-white font-sans overflow-x-hidden selection:bg-cyan-500 selection:text-black">
+
+    <!-- CANVAS BACKGROUND (Espacio estelar & Partículas) -->
+    <canvas id="spaceCanvas" class="fixed inset-0 w-full h-full z-0 pointer-events-none"></canvas>
+
+    <!-- FIXED TOP HEADER (Oculto inicialmente, se muestra tras la animación) -->
+    <header id="mainNav" class="fixed top-0 left-0 w-full z-50 transition-all duration-700 -translate-y-full opacity-0">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="glass-panel rounded-2xl px-6 py-3 flex items-center justify-between border border-cyan-400/30">
+                
+                <!-- Logo Inwit -->
+                <a href="#hero" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 p-0.5 flex items-center justify-center shadow-[0_0_15px_rgba(112,214,255,0.4)]">
+                        <div class="w-full h-full bg-inwit-950 rounded-[10px] flex items-center justify-center">
+                            <svg class="w-6 h-6 text-cyan-300 group-hover:rotate-90 transition-transform duration-500" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6">
+                                <path d="M50 5 L55 45 L95 50 L55 55 L50 95 L45 55 L5 50 L45 45 Z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <span class="font-orbitron font-extrabold text-2xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-blue-400">
+                        INWIT
+                    </span>
+                </a>
+
+                <!-- Nav Links -->
+                <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-blue-100/80">
+                    <a href="#agentes" class="hover:text-cyan-300 transition-colors">Agentes IA</a>
+                    <a href="#soluciones" class="hover:text-cyan-300 transition-colors">Soluciones</a>
+                    <a href="#casos" class="hover:text-cyan-300 transition-colors">Casos de Éxito</a>
+                    <a href="#empresa" class="hover:text-cyan-300 transition-colors">Nosotros</a>
+                </nav>
+
+                <!-- Actions -->
+                <div class="flex items-center space-x-4">
+                    <button id="loginBtn" class="px-5 py-2.5 rounded-xl glass-panel text-cyan-200 font-orbitron text-xs font-semibold tracking-wider hover:text-white hover:bg-cyan-500/20 hover:border-cyan-400/80 transition-all duration-300 hover:shadow-[0_0_20px_rgba(112,214,255,0.4)] flex items-center space-x-2">
+                        <i class="fa-solid fa-right-to-bracket text-cyan-400"></i>
+                        <span>LOG IN</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ESTADO INICIAL 1: PANTALLA HERO INTERACTIVA Y CÓSMICA -->
+    <section id="hero" class="relative min-h-screen w-full flex flex-col items-center justify-center px-4 z-10 pt-10">
+        
+        <!-- ESTADO INICIAL (Antes de hacer Click) -->
+        <div id="startState" class="flex flex-col items-center justify-center text-center cursor-pointer transition-opacity duration-700">
+            <!-- Estrella Geométrica SVG Principal de 4 Puntas -->
+            <div id="heroStarContainer" class="relative group flex items-center justify-center p-8">
+                <!-- Aura de Luz Neón -->
+                <div class="absolute w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-cyan-500/20 blur-3xl animate-star-glow"></div>
+                
+                <svg id="heroStar" class="w-64 h-64 sm:w-80 sm:h-80 relative z-10 transition-transform duration-700 group-hover:scale-105" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Marco exterior simétrico -->
+                    <path d="M150 15 L168 132 L285 150 L168 168 L150 285 L132 168 L15 150 L132 132 Z" stroke="#70d6ff" stroke-width="3" fill="rgba(112, 214, 255, 0.04)" />
+                    <!-- Rombo interior reflejado -->
+                    <path d="M150 60 L180 150 L150 240 L120 150 Z" stroke="#ffffff" stroke-width="2" fill="rgba(255, 255, 255, 0.08)"/>
+                    <!-- Retícula geométrica de líneas -->
+                    <path d="M150 15 L150 285 M15 150 L285 150" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6 6"/>
+                    <!-- Núcleo resplandeciente -->
+                    <circle cx="150" cy="150" r="5" fill="#ffffff" class="animate-ping"/>
+                </svg>
+            </div>
+
+            <!-- Botón CTA para activar secuencia -->
+            <button id="startBtn" class="mt-4 px-8 py-4 rounded-full glass-panel text-cyan-200 font-orbitron tracking-widest text-sm sm:text-base font-bold transition-all duration-300 hover:text-white hover:bg-cyan-500/25 hover:shadow-[0_0_35px_rgba(112,214,255,0.7)] flex items-center space-x-3 group border border-cyan-400/50">
+                <i class="fa-solid fa-sparkles text-cyan-400 group-hover:rotate-45 transition-transform duration-300"></i>
+                <span>HAZ CLICK PARA EMPEZAR</span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-70 group-hover:translate-x-1.5 transition-transform"></i>
+            </button>
+        </div>
+
+        <!-- ESTADO 2: CONTENIDO PRINCIPAL DE SERVICIOS (Aparece tras Supernova) -->
+        <div id="heroContent" class="w-full max-w-7xl mx-auto hidden flex-col items-center justify-center opacity-0 transform translate-y-12 transition-all duration-1000 py-12">
+            
+            <!-- Encabezado "¿Quién te ayudará hoy?" -->
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full glass-panel border border-cyan-400/40 text-cyan-300 text-xs font-mono mb-4">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                    <span>ECOSISTEMA DE AGENTES INWIT</span>
+                </div>
+                <h1 class="font-orbitron text-3xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-blue-400 tracking-tight leading-tight mb-4">
+                    ¿Quién te ayudará hoy?
+                </h1>
+                <p class="text-blue-200/70 text-sm sm:text-base max-w-xl mx-auto">
+                    Selecciona uno de nuestros agentes inteligentes autonomos diseñados para transformar el ritmo operativo de tu organización.
+                </p>
+            </div>
+
+            <!-- GRILLA DE LAS 4 TARJETAS DE AGENTES -->
+            <div id="agentes" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full px-2">
+                
+                <!-- SEEMO -->
+                <div class="agent-card glass-card rounded-2xl p-6 flex flex-col justify-between group">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-400/30 flex items-center justify-center mb-6 text-emerald-400 text-2xl shadow-[0_0_20px_rgba(52,211,153,0.25)] group-hover:scale-110 transition-transform">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-orbitron font-bold text-xl text-white">Seemo</h3>
+                            <span class="text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">COMUNICACIÓN</span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-blue-100/75 leading-relaxed">
+                            Asistente para WhatsApp, Mail y automatización inteligente de citas con procesamiento de lenguaje natural.
+                        </p>
+                    </div>
+                    <div class="mt-8 pt-4 border-t border-white/10 flex items-center justify-between">
+                        <span class="text-xs text-emerald-300/80 font-mono">Disponibilidad 24/7</span>
+                        <a href="#soluciones" onclick="selectSolutionTab(0)" class="w-9 h-9 rounded-xl glass-panel flex items-center justify-center text-emerald-300 group-hover:bg-emerald-400 group-hover:text-black transition-colors">
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- PETRA -->
+                <div class="agent-card glass-card rounded-2xl p-6 flex flex-col justify-between group">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/10 border border-purple-400/30 flex items-center justify-center mb-6 text-purple-400 text-2xl shadow-[0_0_20px_rgba(192,132,252,0.25)] group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-orbitron font-bold text-xl text-white">Petra</h3>
+                            <span class="text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">MULTIMEDIA</span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-blue-100/75 leading-relaxed">
+                            Generación de diseños audiovisuales, edición de contenido gráfico y dirección creativa asistida por IA.
+                        </p>
+                    </div>
+                    <div class="mt-8 pt-4 border-t border-white/10 flex items-center justify-between">
+                        <span class="text-xs text-purple-300/80 font-mono">Generativo 4K</span>
+                        <a href="#soluciones" onclick="selectSolutionTab(1)" class="w-9 h-9 rounded-xl glass-panel flex items-center justify-center text-purple-300 group-hover:bg-purple-400 group-hover:text-black transition-colors">
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ISIS -->
+                <div class="agent-card glass-card rounded-2xl p-6 flex flex-col justify-between group">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 border border-blue-400/30 flex items-center justify-center mb-6 text-blue-400 text-2xl shadow-[0_0_20px_rgba(96,165,250,0.25)] group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-user-doctor"></i>
+                        </div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-orbitron font-bold text-xl text-white">Isis</h3>
+                            <span class="text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">TALENTO / RRHH</span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-blue-100/75 leading-relaxed">
+                            Psicóloga especialista encargada de realizar entrevistas corporativas automáticas y soporte analítico a RRHH.
+                        </p>
+                    </div>
+                    <div class="mt-8 pt-4 border-t border-white/10 flex items-center justify-between">
+                        <span class="text-xs text-blue-300/80 font-mono">Evaluación Conductual</span>
+                        <a href="#soluciones" onclick="selectSolutionTab(2)" class="w-9 h-9 rounded-xl glass-panel flex items-center justify-center text-blue-300 group-hover:bg-blue-400 group-hover:text-black transition-colors">
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- SHINKO -->
+                <div class="agent-card glass-card rounded-2xl p-6 flex flex-col justify-between group">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-400/30 flex items-center justify-center mb-6 text-amber-400 text-2xl shadow-[0_0_20px_rgba(251,191,36,0.25)] group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-chart-network"></i>
+                        </div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-orbitron font-bold text-xl text-white">Shinko</h3>
+                            <span class="text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">DATOS & INDUSTRIA</span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-blue-100/75 leading-relaxed">
+                            Analista de datos avanzado, estudio predictivo y optimización industrial para automatización de manufactura.
+                        </p>
+                    </div>
+                    <div class="mt-8 pt-4 border-t border-white/10 flex items-center justify-between">
+                        <span class="text-xs text-amber-300/80 font-mono">Analítica IoT</span>
+                        <a href="#soluciones" onclick="selectSolutionTab(3)" class="w-9 h-9 rounded-xl glass-panel flex items-center justify-center text-amber-300 group-hover:bg-amber-400 group-hover:text-black transition-colors">
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 2: CARRUSEL INTERACTIVO DE SOLUCIONES CON DEMO COCKPIT -->
+    <section id="soluciones" class="relative py-24 px-4 max-w-7xl mx-auto z-10">
+        
+        <div class="text-center mb-16">
+            <h2 class="font-orbitron text-2xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-blue-400 mb-3">
+                Demostración Visual de Soluciones
+            </h2>
+            <p class="text-blue-200/70 text-sm max-w-2xl mx-auto">
+                Explora cómo trabaja cada agente dentro de la suite Inwit mediante los paneles interactivos en tiempo real.
+            </p>
+        </div>
+
+        <!-- PESTAÑAS DE NAVEGACIÓN DE SOLUCIONES -->
+        <div class="flex justify-center mb-10 overflow-x-auto pb-4 no-scrollbar">
+            <div class="glass-panel p-1.5 rounded-2xl flex space-x-2 border border-cyan-500/30">
+                <button onclick="selectSolutionTab(0)" class="tab-btn active px-6 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-semibold transition-all duration-300 bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">
+                    <i class="fa-brands fa-whatsapp mr-2"></i>Seemo
+                </button>
+                <button onclick="selectSolutionTab(1)" class="tab-btn px-6 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-semibold transition-all duration-300 text-blue-200/70 hover:text-white">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Petra
+                </button>
+                <button onclick="selectSolutionTab(2)" class="tab-btn px-6 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-semibold transition-all duration-300 text-blue-200/70 hover:text-white">
+                    <i class="fa-solid fa-user-doctor mr-2"></i>Isis
+                </button>
+                <button onclick="selectSolutionTab(3)" class="tab-btn px-6 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-semibold transition-all duration-300 text-blue-200/70 hover:text-white">
+                    <i class="fa-solid fa-chart-network mr-2"></i>Shinko
+                </button>
+            </div>
+        </div>
+
+        <!-- CONTENEDOR PRINCIPAL DEL CARRUSEL DE DEMOSTRACIÓN -->
+        <div class="glass-card rounded-3xl p-6 sm:p-10 border border-cyan-400/30 relative overflow-hidden">
+            
+            <div id="solutionDisplay" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- El contenido dinámico se inyectará mediante JS (Seemo inicial) -->
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECCIÓN 3: CASOS DE ÉXITO (MÉTRICAS FICTICIAS REALISTAS) -->
+    <section id="casos" class="relative py-24 px-4 max-w-7xl mx-auto z-10">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+            <div>
+                <span class="text-xs font-mono text-cyan-400 tracking-widest uppercase">RESULTADOS COMPROBADOS</span>
+                <h2 class="font-orbitron text-3xl sm:text-4xl font-bold text-white mt-2">
+                    Casos de Éxito e Impacto
+                </h2>
+            </div>
+            <p class="text-blue-200/70 text-sm max-w-md mt-4 md:mt-0">
+                Organizaciones que transformaron su rendimiento operativo implementando la ecosfera de agentes Inwit.
+            </p>
+        </div>
+
+        <!-- Grilla de Tarjetas de Casos -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- Caso 1: RRHH -->
+            <div class="glass-card rounded-2xl p-8 border border-blue-500/30 relative flex flex-col justify-between">
+                <div>
+                    <div class="text-4xl font-extrabold font-orbitron text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-2">
+                        80%
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-2">Automatización de Entrevistas</h4>
+                    <p class="text-xs text-blue-200/70 leading-relaxed mb-6">
+                        "Agilizamos el proceso de reclutamiento corporativo filtrando más de 5,000 postulantes al mes mediante el agente Isis."
+                    </p>
+                </div>
+                <div class="pt-4 border-t border-white/10 flex items-center justify-between">
+                    <span class="text-xs font-mono text-cyan-300">Global Tech Corp</span>
+                    <span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-1 rounded border border-blue-500/30">Isis IA</span>
+                </div>
+            </div>
+
+            <!-- Caso 2: Comunicaciones -->
+            <div class="glass-card rounded-2xl p-8 border border-cyan-500/30 relative flex flex-col justify-between">
+                <div>
+                    <div class="text-4xl font-extrabold font-orbitron text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-400 mb-2">
+                        95%
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-2">Reducción en Tiempo de Respuesta</h4>
+                    <p class="text-xs text-blue-200/70 leading-relaxed mb-6">
+                        "Seemo gestiona automáticamente agendas, mails y consultas por WhatsApp reduciendo la espera de días a segundos."
+                    </p>
+                </div>
+                <div class="pt-4 border-t border-white/10 flex items-center justify-between">
+                    <span class="text-xs font-mono text-emerald-300">Nexus Logistics</span>
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded border border-emerald-500/30">Seemo IA</span>
+                </div>
+            </div>
+
+            <!-- Caso 3: Manufactura -->
+            <div class="glass-card rounded-2xl p-8 border border-amber-500/30 relative flex flex-col justify-between">
+                <div>
+                    <div class="text-4xl font-extrabold font-orbitron text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-orange-400 mb-2">
+                        300%
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-2">Eficiencia Industrial</h4>
+                    <p class="text-xs text-blue-200/70 leading-relaxed mb-6">
+                        "Shinko analiza patrones de datos en líneas de ensamblaje en tiempo real, previniendo fallas críticas de maquinaria."
+                    </p>
+                </div>
+                <div class="pt-4 border-t border-white/10 flex items-center justify-between">
+                    <span class="text-xs font-mono text-amber-300">Apex Manufacturing</span>
+                    <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-1 rounded border border-amber-500/30">Shinko IA</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECCIÓN 4: SOBRE INWIT (VISIÓN Y MÉTRICAS) -->
+    <section id="empresa" class="relative py-24 px-4 max-w-7xl mx-auto z-10">
+        <div class="glass-panel rounded-3xl p-8 sm:p-12 border border-cyan-400/40 relative overflow-hidden">
+            <!-- Aura brillante de fondo -->
+            <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs font-mono">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>SOBRE LA PLATAFORMA INWIT</span>
+                    </div>
+
+                    <h2 class="font-orbitron text-3xl sm:text-4xl font-bold text-white leading-tight">
+                        Conectando la visión humana con el poder ilimitado de Agentes IA.
+                    </h2>
+
+                    <p class="text-sm text-blue-100/80 leading-relaxed">
+                        En **Inwit**, no solo automatizamos tareas: construimos una fuerza de trabajo sintética especializada. Cada uno de nuestros agentes está optimizado con modelos de lenguaje avanzado y visión por computadora para tomar decisiones precisas e integrarse de manera transparente a los flujos operativos existentes de tu empresa.
+                    </p>
+
+                    <!-- Valores / Pilares -->
+                    <div class="grid grid-cols-2 gap-4 pt-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-300 text-sm">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-white">Privacidad Encriptada</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-300 text-sm">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-white">Baja Latencia (&lt;100ms)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Métricas destacadas -->
+                <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+                    <div class="glass-card rounded-xl p-6 border border-cyan-400/20 text-center">
+                        <div class="font-orbitron text-3xl font-extrabold text-cyan-300 mb-1">99.9%</div>
+                        <div class="text-xs text-blue-200/70 font-mono">TIEMPO DE ACTIVIDAD (UPTIME)</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 border border-cyan-400/20 text-center">
+                        <div class="font-orbitron text-3xl font-extrabold text-blue-400 mb-1">500+</div>
+                        <div class="text-xs text-blue-200/70 font-mono">AGENTES DESPLEGADOS</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 border border-cyan-400/20 text-center sm:col-span-2 lg:col-span-1">
+                        <div class="font-orbitron text-3xl font-extrabold text-purple-400 mb-1">98%</div>
+                        <div class="text-xs text-blue-200/70 font-mono">SATISFACCIÓN DE CLIENTES</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER FUTURISTA -->
+    <footer class="relative z-10 border-t border-cyan-500/20 bg-inwit-950/80 backdrop-blur-md pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 mb-12">
+                
+                <!-- Columna Marca -->
+                <div class="md:col-span-5 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300">
+                            <i class="fa-solid fa-atom"></i>
+                        </div>
+                        <span class="font-orbitron font-bold text-xl text-white">INWIT</span>
+                    </div>
+                    <p class="text-xs text-blue-200/60 leading-relaxed max-w-sm">
+                        Plataforma de orquestación de agentes inteligentes de próxima generación. Elevando la eficiencia industrial, corporativa y creativa.
+                    </p>
+                </div>
+
+                <!-- Columna Enlaces -->
+                <div class="md:col-span-3 space-y-3">
+                    <h5 class="font-orbitron text-xs text-cyan-300 tracking-wider">NAVEGACIÓN</h5>
+                    <ul class="space-y-2 text-xs text-blue-200/70">
+                        <li><a href="#hero" class="hover:text-white transition-colors">Inicio</a></li>
+                        <li><a href="#agentes" class="hover:text-white transition-colors">Nuestros Agentes</a></li>
+                        <li><a href="#soluciones" class="hover:text-white transition-colors">Casos de Uso</a></li>
+                        <li><a href="#empresa" class="hover:text-white transition-colors">Acerca de Inwit</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna Boletín -->
+                <div class="md:col-span-4 space-y-3">
+                    <h5 class="font-orbitron text-xs text-cyan-300 tracking-wider">SUSCRÍBETE A NOVEDADES</h5>
+                    <p class="text-xs text-blue-200/60">Recibe las últimas actualizaciones sobre modelos de IA.</p>
+                    <form onsubmit="event.preventDefault();" class="flex space-x-2">
+                        <input type="email" placeholder="tu@empresa.com" class="px-4 py-2.5 rounded-xl bg-slate-900/80 border border-cyan-500/30 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 flex-1">
+                        <button type="submit" class="px-4 py-2.5 rounded-xl bg-cyan-500 text-black font-orbitron font-bold text-xs hover:bg-cyan-400 transition-colors">
+                            UNIRSE
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-blue-200/40 font-mono">
+                <div>© 2026 INWIT INC. TODOS LOS DERECHOS RESERVADOS.</div>
+                <div class="flex space-x-6 mt-4 sm:mt-0">
+                    <a href="#" class="hover:text-cyan-300 transition-colors"><i class="fa-brands fa-twitter text-sm"></i></a>
+                    <a href="#" class="hover:text-cyan-300 transition-colors"><i class="fa-brands fa-linkedin text-sm"></i></a>
+                    <a href="#" class="hover:text-cyan-300 transition-colors"><i class="fa-brands fa-github text-sm"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL SIMPLE DE LOGIN -->
+    <div id="loginModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel rounded-2xl p-8 w-full max-w-md border border-cyan-400/40 relative">
+            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h2 class="font-orbitron text-2xl font-bold text-cyan-300 mb-6 text-center">Acceso a Inwit</h2>
+            <form class="space-y-4" onsubmit="event.preventDefault();">
+                <div>
+                    <label class="block text-xs font-mono text-cyan-200/80 mb-1">CORREO ELECTRÓNICO</label>
+                    <input type="email" placeholder="usuario@inwit.ai" class="w-full px-4 py-3 rounded-xl bg-slate-900/70 border border-cyan-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono text-cyan-200/80 mb-1">CONTRASEÑA</label>
+                    <input type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl bg-slate-900/70 border border-cyan-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 text-sm">
+                </div>
+                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-orbitron font-bold tracking-wider hover:brightness-110 shadow-[0_0_25px_rgba(112,214,255,0.4)] transition-all text-sm">
+                    INICIAR SESIÓN
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT ANIMACIONES Y LÓGICA DE SOLUCIONES -->
+    <script>
+        // --- 1. CANVAS ESPACIAL DE PARTICULAS Y VELOCIDAD WARP ---
+        const canvas = document.getElementById('spaceCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initStars();
+        });
+
+        let stars = [];
+        let isSupernova = false;
+        let starSpeed = 0.8;
+
+        class Star {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = (Math.random() - 0.5) * width * 2;
+                this.y = (Math.random() - 0.5) * height * 2;
+                this.z = Math.random() * width;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.color = ['#ffffff', '#70d6ff', '#52b2fa', '#a78bfa'][Math.floor(Math.random() * 4)];
+            }
+            update() {
+                this.z -= starSpeed;
+                if (this.z <= 0) {
+                    this.reset();
+                    this.z = width;
+                }
+            }
+            draw() {
+                const sx = (this.x / this.z) * (width / 2) + width / 2;
+                const sy = (this.y / this.z) * (height / 2) + height / 2;
+                const r = (1 - this.z / width) * this.size * (isSupernova ? 3.5 : 1);
+
+                if (sx >= 0 && sx < width && sy >= 0 && sy < height) {
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, Math.max(0.1, r), 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = Math.min(1, (1 - this.z / width) + 0.2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < 350; i++) stars.push(new Star());
+        }
+        initStars();
+
+        function animateSpace() {
+            ctx.fillStyle = isSupernova ? 'rgba(3, 7, 18, 0.25)' : 'rgba(3, 7, 18, 0.4)';
+            ctx.fillRect(0, 0, width, height);
+
+            stars.forEach(s => {
+                s.update();
+                s.draw();
+            });
+
+            requestAnimationFrame(animateSpace);
+        }
+
+        // --- 2. TRANSICIÓN INTERACTIVA (ESTRELLA -> SUPERNOVA -> HERO + CONTENT) ---
+        const startState = document.getElementById('startState');
+        const startBtn = document.getElementById('startBtn');
+        const heroStar = document.getElementById('heroStar');
+        const mainNav = document.getElementById('mainNav');
+        const heroContent = document.getElementById('heroContent');
+
+        let started = false;
+
+        function startExperience() {
+            if (started) return;
+            started = true;
+
+            // Animación estelar
+            heroStar.classList.add('animate-supernova');
+            startBtn.style.opacity = '0';
+            startBtn.style.transform = 'scale(0.8)';
+            
+            isSupernova = true;
+            starSpeed = 16; // Efecto Warp Speed
+
+            setTimeout(() => {
+                startState.style.opacity = '0';
+            }, 800);
+
+            setTimeout(() => {
+                startState.style.display = 'none';
+                starSpeed = 1.2; // Normalizar velocidad del espacio
+
+                // Revelar Header Fijo
+                mainNav.classList.remove('-translate-y-full', 'opacity-0');
+
+                // Revelar Contenido Principal
+                heroContent.classList.remove('hidden');
+                setTimeout(() => {
+                    heroContent.classList.remove('opacity-0', 'translate-y-12');
+                    heroContent.classList.add('opacity-100', 'translate-y-0');
+                }, 50);
+
+            }, 1500);
+        }
+
+        startBtn.addEventListener('click', startExperience);
+        heroStar.parentElement.addEventListener('click', startExperience);
+
+        // --- 3. DATOS Y LÓGICA DEL CARRUSEL DE DEMOSTRACIÓN DE SOLUCIONES ---
+        const solutionsData = [
+            {
+                name: "Seemo",
+                title: "Asistente Automatizado de Comunicaciones",
+                tag: "RESPUESTA INMEDIATA 24/7",
+                color: "emerald",
+                desc: "Seemo integra directamente tus canales de comunicación de WhatsApp, correo electrónico y CRM corporativo. Puede agendar citas, responder preguntas frecuentes y realizar seguimiento a clientes sin intervención humana.",
+                features: [
+                    "Integración nativa con WhatsApp Business API y Gmail/Outlook.",
+                    "Reconocimiento de intenciones y agenda en tiempo real.",
+                    "Calificación automática de leads y canalización comercial."
+                ],
+                mockup: `
+                    <div class="glass-panel rounded-2xl p-4 border border-emerald-500/30 font-sans">
+                        <div class="flex items-center space-x-3 pb-3 border-b border-white/10 mb-4">
+                            <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-xs"><i class="fa-brands fa-whatsapp"></i></div>
+                            <div>
+                                <div class="text-xs font-bold text-white">Seemo Assistant</div>
+                                <div class="text-[10px] text-emerald-400">En línea • Conectado a CRM</div>
+                            </div>
+                        </div>
+                        <div class="space-y-3 text-xs">
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg max-w-[80%] text-blue-100/90">
+                                Hola, quisiera agendar una demostración para mañana a las 10 AM.
+                            </div>
+                            <div class="bg-emerald-950/60 border border-emerald-500/30 p-2.5 rounded-lg max-w-[85%] ml-auto text-emerald-100">
+                                ¡Hola! He verificado la agenda. Tengo libre mañana a las 10:00 AM. ¿Deseas confirmar la cita para <strong>Demo Inwit Platform</strong>?
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg max-w-[80%] text-blue-100/90">
+                                Sí, por favor. Mi correo es cliente@empresa.com.
+                            </div>
+                            <div class="bg-emerald-950/60 border border-emerald-500/30 p-2.5 rounded-lg max-w-[85%] ml-auto text-emerald-100 flex items-center space-x-2">
+                                <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                                <span>Cita agendada y confirmación enviada a su correo.</span>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                name: "Petra",
+                title: "Estudio Creativo Audiovisual Generativo",
+                tag: "RENDERIZADO MULTIMEDIA 4K",
+                color: "purple",
+                desc: "Petra asiste a tus equipos creativos generando piezas publicitarias, banners adaptativos y edición de video a partir de texto o esquemas conceptuales en segundos.",
+                features: [
+                    "Generación de gráficos corporativos alineados con tu manual de marca.",
+                    "Edición automatizada de video para redes sociales.",
+                    "Exportador multiformato inmediato para campañas masivas."
+                ],
+                mockup: `
+                    <div class="glass-panel rounded-2xl p-4 border border-purple-500/30">
+                        <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+                            <span class="text-xs font-mono text-purple-300"><i class="fa-solid fa-film mr-1"></i> Workspace Petra v2.4</span>
+                            <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded">Generando...</span>
+                        </div>
+                        <div class="aspect-video bg-gradient-to-tr from-purple-900/40 via-slate-900 to-indigo-950 rounded-xl border border-purple-500/20 flex flex-col items-center justify-center p-4 text-center relative overflow-hidden">
+                            <div class="absolute inset-0 bg-purple-500/10 backdrop-blur-[1px]"></div>
+                            <i class="fa-solid fa-photo-film text-4xl text-purple-400 mb-2 relative z-10 animate-bounce"></i>
+                            <span class="text-xs font-orbitron text-white relative z-10">Generando Render 3D Neón</span>
+                            <div class="w-48 bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden relative z-10">
+                                <div class="bg-purple-400 h-full w-3/4"></div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                name: "Isis",
+                title: "Psicóloga Digital & Selección de Talento RRHH",
+                tag: "ANALÍTICA CONDUCTUAL",
+                color: "blue",
+                desc: "Isis lidera el filtrado inicial de candidatos realizando entrevistas estructuradas por voz o chat. Evalúa competencias clave, alineación cultural y genera informes psicométricos automáticos.",
+                features: [
+                    "Entrevistas adaptativas basadas en la descripción del puesto.",
+                    "Detección de patrones de comunicación y competencias clave.",
+                    "Reporte ejecutivo resumido con puntuación para el equipo de RRHH."
+                ],
+                mockup: `
+                    <div class="glass-panel rounded-2xl p-4 border border-blue-500/30">
+                        <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+                            <span class="text-xs font-mono text-blue-300"><i class="fa-solid fa-user-check mr-1"></i> Sesión Entrevista Isis</span>
+                            <span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded">Score: 94/100</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="text-xs font-semibold text-white">Evaluación de Competencia: Liderazgo</div>
+                            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                                <div class="bg-blue-400 h-full w-11/12"></div>
+                            </div>
+                            <div class="text-[11px] text-blue-200/70 pt-2 italic">
+                                "El candidato demuestra alta resolución de problemas bajo presión y excelente articulación estratégica."
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                name: "Shinko",
+                title: "Analista de Datos & Optimización de Manufactura",
+                tag: "PREDICCIÓN INDUSTRIAL IoT",
+                color: "amber",
+                desc: "Shinko procesa millones de puntos de datos de sensores de planta y registros financieros para predecir fallas en maquinaria, optimizar tiempos de producción y automatizar la cadena de suministro.",
+                features: [
+                    "Monitoreo predictivo de mantenimiento industrial.",
+                    "Estudio de datos de eficiencia de líneas de producción (OEE).",
+                    "Alertas tempranas de anomalías operativas."
+                ],
+                mockup: `
+                    <div class="glass-panel rounded-2xl p-4 border border-amber-500/30">
+                        <div class="flex items-center justify-between pb-2 border-b border-white/10 mb-3">
+                            <span class="text-xs font-mono text-amber-300"><i class="fa-solid fa-chart-line mr-1"></i> Shinko Analytics Dashboard</span>
+                            <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded">OEE: 98.4%</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center mb-3">
+                            <div class="bg-slate-900/80 p-2 rounded-lg"><div class="text-[10px] text-gray-400">Temp</div><div class="text-xs font-bold text-amber-300">42°C</div></div>
+                            <div class="bg-slate-900/80 p-2 rounded-lg"><div class="text-[10px] text-gray-400">Vibración</div><div class="text-xs font-bold text-green-400">Normal</div></div>
+                            <div class="bg-slate-900/80 p-2 rounded-lg"><div class="text-[10px] text-gray-400">Eficiencia</div><div class="text-xs font-bold text-cyan-300">+14%</div></div>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        function selectSolutionTab(index) {
+            const data = solutionsData[index];
+            const display = document.getElementById('solutionDisplay');
+            
+            // Actualizar estado botones pestaña
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach((btn, i) => {
+                if (i === index) {
+                    btn.className = `tab-btn active px-6 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-semibold transition-all duration-300 bg-cyan-500/20 text-cyan-300 border border-cyan-400/40`;
+                } else {
+                    btn.className = `tab-btn px-6 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-semibold transition-all duration-300 text-blue-200/70 hover:text-white`;
+                }
+            });
+
+            // Inyectar contenido en el display
+            display.innerHTML = `
+                <div class="lg:col-span-6 space-y-6">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs font-mono">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                        <span>${data.tag}</span>
+                    </div>
+                    <h3 class="font-orbitron text-2xl sm:text-3xl font-bold text-white leading-snug">
+                        ${data.name} — ${data.title}
+                    </h3>
+                    <p class="text-sm text-blue-100/80 leading-relaxed">
+                        ${data.desc}
+                    </p>
+                    <ul class="space-y-3 pt-2">
+                        ${data.features.map(f => `
+                            <li class="flex items-start space-x-3 text-xs sm:text-sm text-blue-200">
+                                <i class="fa-solid fa-circle-check text-cyan-400 mt-0.5"></i>
+                                <span>${f}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                    <div class="pt-4">
+                        <button onclick="document.getElementById('loginModal').classList.remove('opacity-0', 'pointer-events-none')" class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-orbitron text-xs font-bold tracking-wider hover:brightness-110 shadow-[0_0_20px_rgba(112,214,255,0.4)] transition-all">
+                            SOLICITAR DEMOSTRACIÓN
+                        </button>
+                    </div>
+                </div>
+                <div class="lg:col-span-6">
+                    ${data.mockup}
+                </div>
+            `;
+        }
+
+        // Cargar primera solución por defecto
+        selectSolutionTab(0);
+
+        // --- 4. MODAL LOG IN ---
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        loginBtn.addEventListener('click', () => {
+            loginModal.classList.remove('opacity-0', 'pointer-events-none');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            loginModal.classList.add('opacity-0', 'pointer-events-none');
+        });
+
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) loginModal.classList.add('opacity-0', 'pointer-events-none');
+        });
+
+        // Iniciar canvas en carga de ventana
+        window.onload = function() {
+            animateSpace();
+        };
+    </script>
+</body>
+</html>

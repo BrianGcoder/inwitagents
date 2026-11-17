@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es" class="dark h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seemo - Comunicaciones & Citas | INWIT</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        seemo: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            cyan: '#06b6d4'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #040d1a;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        /* Multilingual Canvas Styling */
+        #greetings-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism styling */
+        .glass-card {
+            background: rgba(8, 20, 38, 0.78);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .glass-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card-hover:hover {
+            border-color: rgba(52, 211, 153, 0.5);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(6, 78, 59, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(16, 185, 129, 0.4);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(52, 211, 153, 0.7);
+        }
+
+        /* Seemo Emerald Glow */
+        .seemo-glow {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+            animation: pulse-emerald 3s infinite alternate;
+        }
+
+        @keyframes pulse-emerald {
+            0% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+            100% { box-shadow: 0 0 35px rgba(52, 211, 153, 0.6); }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col relative select-none antialiased text-gray-100">
+
+    <!-- Interactive Multilingual Canvas Animation -->
+    <canvas id="greetings-canvas"></canvas>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 w-full glass-card border-b border-emerald-900/40 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <a href="index.html" class="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-800/50 px-3 py-1.5 rounded-lg transition-all">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span class="hidden sm:inline">Volver a</span> INWIT
+            </a>
+            <div class="h-5 w-[1px] bg-emerald-900/50"></div>
+            <!-- Seemo Agent Avatar & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-800 via-emerald-600 to-cyan-400 text-white shadow-lg shadow-emerald-950">
+                    <i class="fa-solid fa-comments text-lg"></i>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-slate-950 rounded-full animate-pulse"></span>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="font-bold text-base text-white tracking-wide">Seemo</h1>
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-300 bg-emerald-950/90 border border-emerald-500/40 px-2 py-0.5 rounded-full">Comunicaciones AI</span>
+                    </div>
+                    <p class="text-xs text-emerald-300/70">Automatización de Mensajería, Correo &amp; Citas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="flex items-center space-x-3">
+            <button id="history-btn" onclick="toggleHistoryModal()" class="flex items-center space-x-2 text-xs text-gray-300 hover:text-white bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 px-3 py-2 rounded-xl transition">
+                <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i>
+                <span class="hidden md:inline">Historial</span>
+            </button>
+            <div class="hidden sm:flex items-center space-x-2 bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-xl text-xs font-medium">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Activo 24/7</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="relative z-10 flex-1 max-w-5xl w-full mx-auto px-4 py-6 flex flex-col justify-between overflow-hidden">
+        
+        <!-- Welcome Hero State -->
+        <div id="hero-section" class="flex-1 flex flex-col items-center justify-center text-center my-auto transition-all duration-500 max-w-3xl mx-auto py-8">
+            
+            <!-- Agent Icon Badge -->
+            <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-400 via-emerald-600 to-cyan-600 p-0.5 shadow-2xl shadow-emerald-500/30 mb-6 seemo-glow">
+                <div class="w-full h-full bg-slate-950 rounded-[22px] flex items-center justify-center">
+                    <i class="fa-solid fa-paper-plane text-3xl text-emerald-400"></i>
+                </div>
+            </div>
+
+            <!-- Version Tag -->
+            <div class="inline-flex items-center space-x-2 bg-emerald-950/80 border border-emerald-500/30 px-3 py-1 rounded-full text-xs text-emerald-300 font-semibold mb-4">
+                <i class="fa-solid fa-sparkles text-emerald-400"></i>
+                <span>Seemo v2.4 • Gestión de Canales Multicanal</span>
+            </div>
+
+            <!-- Mandatory Main Headline -->
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-4 leading-tight">
+                Soy <span class="bg-gradient-to-r from-emerald-400 via-emerald-300 to-cyan-400 bg-clip-text text-transparent">Seemo de Inwit</span>, déjame ayudarte, ¿Qué debemos hacer?
+            </h2>
+
+            <!-- Subtitle -->
+            <p class="text-base sm:text-lg text-emerald-100/80 font-normal leading-relaxed max-w-xl mb-8">
+                Asistente inteligente para la automatización de WhatsApp, correo electrónico, llamadas y agendamiento de citas.
+            </p>
+
+            <!-- Quick Action Suggestion Chips -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full max-w-xl">
+                <button onclick="startAction('📱 Conectar mi cuenta de WhatsApp empresarial para respuestas automáticas')" class="glass-card glass-card-hover p-4 rounded-2xl text-left flex items-start space-x-3 transition text-emerald-100 group">
+                    <div class="p-2.5 rounded-xl bg-emerald-950 border border-emerald-800/60 text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition">
+                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm text-white group-hover:text-emerald-300 transition">📱 Conectar WhatsApp</div>
+                        <div class="text-xs text-slate-400">Integrar respuestas automáticas y flujos en vivo</div>
+                    </div>
+                </button>
+
+                <button onclick="startAction('📅 Agendar una cita técnica con el cliente para mañana a las 10:00 AM')" class="glass-card glass-card-hover p-4 rounded-2xl text-left flex items-start space-x-3 transition text-emerald-100 group">
+                    <div class="p-2.5 rounded-xl bg-emerald-950 border border-emerald-800/60 text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition">
+                        <i class="fa-regular fa-calendar-check text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm text-white group-hover:text-emerald-300 transition">📅 Agendar cita</div>
+                        <div class="text-xs text-slate-400">Sincronizar Google Calendar y enviar confirmación</div>
+                    </div>
+                </button>
+
+                <button onclick="startAction('✉️ Redactar correo corporativo de seguimiento comercial')" class="glass-card glass-card-hover p-4 rounded-2xl text-left flex items-start space-x-3 transition text-emerald-100 group">
+                    <div class="p-2.5 rounded-xl bg-emerald-950 border border-emerald-800/60 text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition">
+                        <i class="fa-regular fa-envelope text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm text-white group-hover:text-emerald-300 transition">✉️ Redactar correo</div>
+                        <div class="text-xs text-slate-400">Generar plantilla optimizada y programar envío</div>
+                    </div>
+                </button>
+
+                <button onclick="startAction('🔄 Automatizar flujo masivo de recordatorios de pago')" class="glass-card glass-card-hover p-4 rounded-2xl text-left flex items-start space-x-3 transition text-emerald-100 group">
+                    <div class="p-2.5 rounded-xl bg-emerald-950 border border-emerald-800/60 text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-arrows-split-up-and-left text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm text-white group-hover:text-emerald-300 transition">🔄 Automatizar flujo</div>
+                        <div class="text-xs text-slate-400">Disparar secuencias multicanal dinámicas</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Stream (Revealed dynamically) -->
+        <div id="chat-stream" class="hidden flex-1 overflow-y-auto space-y-4 pr-2 pb-6 max-h-[calc(100vh-210px)]">
+            <!-- Dynamic Messages -->
+        </div>
+
+        <!-- Fixed Bottom Input Area -->
+        <div class="w-full pt-2">
+            <form id="chat-form" onsubmit="handleSend(event)" class="glass-card rounded-2xl p-2 sm:p-3 flex flex-col space-y-2 border-emerald-500/30 shadow-2xl">
+                
+                <!-- Ribbon Config & Modes -->
+                <div class="flex items-center justify-between px-2 text-xs text-slate-400">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-[11px] font-semibold tracking-wider text-emerald-400 uppercase">Canal Activo:</span>
+                        <select id="mode-selector" class="bg-slate-950 border border-emerald-900 text-emerald-200 text-xs rounded-lg px-2 py-0.5 focus:outline-none focus:border-emerald-500">
+                            <option value="diagnostico">Modo Diagnóstico &amp; Estrategia</option>
+                            <option value="whatsapp">Enviar por WhatsApp API</option>
+                            <option value="citas">Agendar Cita en Calendario</option>
+                            <option value="email">Despacho de Correo Masivo</option>
+                        </select>
+                    </div>
+                    <span class="hidden md:inline text-[11px] text-emerald-300/70">Protocolo API INWIT 99.9% Uptime</span>
+                </div>
+
+                <!-- Input Field Row -->
+                <div class="flex items-center space-x-2">
+                    <button type="button" onclick="triggerFileUpload()" title="Adjuntar archivo o base de contactos" class="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-emerald-400 hover:text-emerald-300 transition">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </button>
+                    <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)">
+
+                    <input type="text" id="user-input" placeholder="Escribe tu instrucción o consulta sobre comunicaciones..." class="flex-1 bg-slate-950/80 text-white placeholder-slate-500 text-sm rounded-xl px-4 py-3 border border-slate-800 focus:outline-none focus:border-emerald-500 transition">
+                    
+                    <button type="button" id="mic-btn" onclick="toggleMic()" title="Dictar consulta por voz" class="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-emerald-400 transition">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+
+                    <button type="submit" class="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-semibold text-sm shadow-lg shadow-emerald-500/25 flex items-center space-x-2 transition">
+                        <span>Enviar</span>
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full rounded-2xl p-6 border border-emerald-500/30">
+            <div class="flex items-center justify-between border-b border-emerald-950 pb-3 mb-4">
+                <div class="flex items-center space-x-2 text-emerald-400">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <h3 class="font-bold text-lg text-white">Historial de Comunicaciones</h3>
+                </div>
+                <button onclick="toggleHistoryModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                <div class="p-3 bg-slate-900/80 border border-slate-800 rounded-xl hover:border-emerald-500/40 transition cursor-pointer">
+                    <div class="text-xs font-semibold text-emerald-300">Campaña WhatsApp - Promoción Q1</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Hoy, 11:20 AM • 450 Mensajes Enviados (98% Entrega)</div>
+                </div>
+                <div class="p-3 bg-slate-900/80 border border-slate-800 rounded-xl hover:border-emerald-500/40 transition cursor-pointer">
+                    <div class="text-xs font-semibold text-emerald-300">Agendamiento Demo Cliente Corp</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Ayer, 4:15 PM • Cita sincrinizada en Google Calendar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Core & Multilingual Greetings Canvas -->
+    <script>
+        // -------------------------------------------------------------------
+        // 1. Multilingual Greetings Dynamic 2D Canvas Animation
+        // -------------------------------------------------------------------
+        const canvas = document.getElementById('greetings-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+
+        const GREETINGS = [
+            "Hola", "Hello", "Bonjour", "Ciao", "Olá", 
+            "Hallo", "Konnichiwa", "Namaste", "Nǐ hǎo", 
+            "Salam", "Zdravstvuyte", "Aloha", "Shalom", 
+            "Swasthi", "God dag", "Bienvenido", "Welcome"
+        ];
+
+        let floatingTextArray = [];
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class FloatingGreeting {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * (width - 100) + 50;
+                this.y = Math.random() * (height - 100) + 50;
+                this.text = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+                this.fontSize = Math.floor(Math.random() * 18) + 14;
+                this.opacity = 0;
+                this.maxOpacity = Math.random() * 0.35 + 0.15;
+                this.fadeIn = true;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.life = 0;
+                this.maxLife = Math.random() * 300 + 200;
+                // Emerald or Cyan tone
+                this.color = Math.random() > 0.4 ? '#34d399' : '#06b6d4';
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.life++;
+
+                if (this.fadeIn) {
+                    this.opacity += 0.005;
+                    if (this.opacity >= this.maxOpacity) {
+                        this.fadeIn = false;
+                    }
+                } else if (this.life > this.maxLife - 60) {
+                    this.opacity -= 0.006;
+                }
+
+                if (this.opacity <= 0 || this.life >= this.maxLife) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.font = `600 ${this.fontSize}px Inter, sans-serif`;
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = Math.max(0, this.opacity);
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 12;
+                ctx.fillText(this.text, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        function initGreetings() {
+            floatingTextArray = [];
+            const textCount = Math.floor(width / 60);
+            for (let i = 0; i < Math.max(16, textCount); i++) {
+                const item = new FloatingGreeting();
+                item.life = Math.floor(Math.random() * item.maxLife); // Stagger initial phases
+                floatingTextArray.push(item);
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+
+            floatingTextArray.forEach(item => {
+                item.update();
+                item.draw();
+            });
+
+            requestAnimationFrame(animateCanvas);
+        }
+
+        // -------------------------------------------------------------------
+        // 2. Chat Interaction Logic
+        // -------------------------------------------------------------------
+        const heroSection = document.getElementById('hero-section');
+        const chatStream = document.getElementById('chat-stream');
+        const userInput = document.getElementById('user-input');
+
+        function startAction(promptText) {
+            userInput.value = promptText;
+            handleSend(new Event('submit'));
+        }
+
+        function handleSend(event) {
+            if(event) event.preventDefault();
+            const text = userInput.value.trim();
+            if(!text) return;
+
+            // Hide Hero and reveal stream on first interaction
+            if(!heroSection.classList.contains('hidden')) {
+                heroSection.classList.add('hidden');
+                chatStream.classList.remove('hidden');
+            }
+
+            // Render User Prompt
+            renderUserMessage(text);
+            userInput.value = '';
+            chatStream.scrollTop = chatStream.scrollHeight;
+
+            // Simulate Seemo Response
+            setTimeout(() => {
+                renderSeemoResponse(text);
+                chatStream.scrollTop = chatStream.scrollHeight;
+            }, 850);
+        }
+
+        function renderUserMessage(text) {
+            const msgHtml = `
+                <div class="flex justify-end mb-4">
+                    <div class="max-w-xl bg-emerald-700 text-white p-4 rounded-2xl rounded-tr-none shadow-lg">
+                        <div class="text-xs text-emerald-200 mb-1 font-semibold">Tú</div>
+                        <p class="text-sm leading-relaxed">${escapeHtml(text)}</p>
+                    </div>
+                </div>
+            `;
+            chatStream.insertAdjacentHTML('beforeend', msgHtml);
+        }
+
+        function renderSeemoResponse(queryText) {
+            let cardHtml = '';
+            const lowerQuery = queryText.toLowerCase();
+
+            if (lowerQuery.includes('whatsapp')) {
+                cardHtml = `
+                    <p class="text-sm leading-relaxed mb-3">
+                        ¡Entendido! He verificado el conector de <strong>WhatsApp Business Cloud API</strong> de INWIT. Aquí tienes el panel de envío activo:
+                    </p>
+                    <div class="p-4 bg-slate-950/90 rounded-xl border border-emerald-500/30 space-y-3 mb-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-emerald-400 uppercase flex items-center space-x-2">
+                                <i class="fa-brands fa-whatsapp text-emerald-400"></i>
+                                <span>Canal WhatsApp Activo</span>
+                            </span>
+                            <span class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-700">Estado: Listo</span>
+                        </div>
+                        <div class="text-xs text-slate-300">
+                            <strong>Plantilla detectada:</strong> "Hola {{nombre}}, recordatorio de sesión agendada para el {{fecha}} a las {{hora}}."
+                        </div>
+                        <div class="flex items-center space-x-2 pt-1">
+                            <button onclick="simulatedAction('Mensaje de WhatsApp enviado correctamente')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-medium transition">
+                                Despachar Notificación
+                            </button>
+                            <span class="text-[11px] text-slate-400">Tiempo de entrega estimado: &lt; 2s</span>
+                        </div>
+                    </div>
+                `;
+            } else if (lowerQuery.includes('cita') || lowerQuery.includes('agendar')) {
+                cardHtml = `
+                    <p class="text-sm leading-relaxed mb-3">
+                        Perfecto. He consultado la disponibilidad en <strong>Google Calendar &amp; Outlook INWIT</strong>:
+                    </p>
+                    <div class="p-4 bg-slate-950/90 rounded-xl border border-emerald-500/30 space-y-3 mb-2">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <div class="text-xs font-bold text-white flex items-center space-x-2">
+                                <i class="fa-regular fa-calendar-check text-emerald-400"></i>
+                                <span>Reunión de Demostración Técnica</span>
+                            </div>
+                            <span class="text-[10px] text-emerald-400 font-bold">10:00 AM - 10:45 AM</span>
+                        </div>
+                        <div class="text-xs text-slate-300 space-y-1">
+                            <div><strong>Participantes:</strong> usuario@inwit.ai, cliente@empresa.com</div>
+                            <div><strong>Plataforma:</strong> Google Meet (Enlace auto-generado)</div>
+                        </div>
+                        <button onclick="simulatedAction('Cita agendada y recordatorio multicanal programado')" class="w-full py-2 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white rounded-lg text-xs font-bold transition">
+                            Confirmar &amp; Enviar Invitaciones
+                        </button>
+                    </div>
+                `;
+            } else {
+                cardHtml = `
+                    <p class="text-sm leading-relaxed mb-2">
+                        Procesando tu instrucción: <em>"${escapeHtml(queryText)}"</em>.
+                    </p>
+                    <p class="text-sm leading-relaxed">
+                        Como asistente de comunicaciones de Inwit, puedo conectar tus campañas de mensajería masiva, automatizar confirmaciones de citas por WhatsApp, enviar emails transaccionales o sincronizar recordatorios. ¿Qué canal deseas priorizar?
+                    </p>
+                `;
+            }
+
+            const aiMsgHtml = `
+                <div class="flex justify-start mb-4">
+                    <div class="flex space-x-3 max-w-2xl">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-cyan-400 flex items-center justify-center text-white shrink-0 shadow-md">
+                            <i class="fa-solid fa-comments text-xs"></i>
+                        </div>
+                        <div class="glass-card p-4 rounded-2xl rounded-tl-none border-emerald-500/30 text-gray-100 shadow-xl space-y-2">
+                            <div class="flex items-center space-x-2 text-xs text-emerald-400 font-semibold mb-1">
+                                <span>Seemo</span>
+                                <span class="text-[10px] text-slate-400">• Inwit Communications AI</span>
+                            </div>
+                            ${cardHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            chatStream.insertAdjacentHTML('beforeend', aiMsgHtml);
+        }
+
+        function simulatedAction(statusText) {
+            const toastHtml = `
+                <div class="flex justify-start mb-4 animate-fade-in">
+                    <div class="ml-11 bg-emerald-950/90 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs flex items-center space-x-2">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                        <span>${statusText}</span>
+                    </div>
+                </div>
+            `;
+            chatStream.insertAdjacentHTML('beforeend', toastHtml);
+            chatStream.scrollTop = chatStream.scrollHeight;
+        }
+
+        // Helper UI functions
+        function toggleHistoryModal() {
+            const modal = document.getElementById('history-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function triggerFileUpload() {
+            document.getElementById('file-input').click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if(file) {
+                userInput.value = `[Adjunto: ${file.name}] Cargar lista de contactos para campaña de mensajería.`;
+            }
+        }
+
+        function toggleMic() {
+            const btn = document.getElementById('mic-btn');
+            btn.classList.toggle('text-rose-500');
+            btn.classList.toggle('animate-pulse');
+            if(btn.classList.contains('text-rose-500')) {
+                userInput.placeholder = "Escuchando instrucción vocal...";
+            } else {
+                userInput.placeholder = "Escribe tu instrucción o consulta sobre comunicaciones...";
+            }
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;")
+                       .replace(/</g, "&lt;")
+                       .replace(/>/g, "&gt;")
+                       .replace(/"/g, "&quot;")
+                       .replace(/'/g, "&#039;");
+        }
+
+        // Initialize Animation Loop on load
+        window.onload = function() {
+            resizeCanvas();
+            initGreetings();
+            animateCanvas();
+        };
+    </script>
+</body>
+</html>
